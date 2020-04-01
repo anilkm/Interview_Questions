@@ -1,5 +1,5 @@
 //Amazon Interview question
-//Problem title - Find the number of islands
+//Proble title - Find the number of islands
 /*Problem Description - 
 Given a boolean 2D matrix, find the number of islands. A group of connected 1s forms an island. 
 For example, the below matrix contains 5 islands
@@ -11,3 +11,104 @@ Input : mat[][] = {{1, 1, 0, 0, 0},
 Output : 5
 */
 
+#include <iostream>
+#include <stack>
+using namespace std;
+
+#define ROW 100
+#define COLUMN 100
+
+bool Matrix[ROW][COLUMN];
+
+int r;  //no of rows in input matrix
+int c;  // no of column in input matrix
+
+//row and col is valid if wintin matrix boundaries and not zero
+bool isSafe(int row, int col)
+{
+	return ((row >= 0 && row < r) &&
+		(col >= 0 && col < c) &&
+		(Matrix[row][col] != 0)
+		);
+}
+
+void DFS(stack < pair<int, int> > s)
+{
+	pair <int, int> p;
+	
+	static int rowlist[] = {-1, -1, -1, 0, 0, 1, 1, 1};
+	static int collist[] = { -1, 0, 1, -1, 1, -1, 0, 1 };
+
+	while (!s.empty())
+	{
+		p = s.top();
+		s.pop();
+
+		for (int k=0; k<8; ++k)
+		{
+			if (isSafe(p.first + rowlist[k], p.second + collist[k]))
+			{
+				Matrix[p.first + rowlist[k]][p.second + collist[k]] = 0;
+				s.push(make_pair(p.first + rowlist[k], p.second + collist[k]));
+			}
+		}
+
+	}
+}
+
+void solve(int *ans)
+{
+	// using DFS approach
+	//Mark (row,col) of matrix as 0 if it is not zero and visited 
+
+	stack< pair<int,int> > s;
+	int i, j;
+
+	for (i=0; i<r; ++i)
+	{
+		for (j=0; j<c; ++j)
+		{
+			if (Matrix[i][j] != 0 && Matrix[i][j] != -1) // (row,col) is not zero and not visited
+			{
+				s.push(make_pair(i,j));
+				(*ans)++;  //found one island
+
+				//process connected 1s
+				Matrix[i][j] = -1;
+				DFS(s);
+			}
+		}
+	}
+}
+
+void input()
+{
+	int i;
+	int j;
+
+	cin >> r >> c;
+
+	for (i=0; i<r; ++i)
+	{
+		for (j=0; j<c; ++j)
+		{
+			cin >> Matrix[i][j];
+		}
+	}
+}
+
+int main()
+{
+	int ans = 0;
+
+	//input
+	input();
+	
+	//solve
+	solve(&ans);
+
+	//print solution
+	cout << ans << endl;
+
+	system("pause");
+}
